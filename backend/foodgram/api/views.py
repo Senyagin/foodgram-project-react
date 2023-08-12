@@ -2,8 +2,6 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from recipes.models import (AmountIngredients, Favorite, Ingredient, Recipe,
-                            ShoppingCart, Tag)
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
@@ -14,9 +12,15 @@ from users.models import Follow, User
 from .filters import IngredientSearchFilter, RecipesFilter
 from .pagination import LimitPagePagination
 from .permissions import AdminOrAuthor, AdminOrReadOnly
-from .serializers import (FollowSerializer, IngredientSerializer,
-                          RecipeCreateSerializer, RecipeForFollowersSerializer,
-                          RecipeSerializer, TagSerializer, UsersSerializer)
+from .serializers import (
+    FollowSerializer, IngredientSerializer,
+    RecipeCreateSerializer, RecipeForFollowersSerializer,
+    RecipeSerializer, TagSerializer, UsersSerializer
+)
+from recipes.models import (
+    AmountIngredients, Favorite, Ingredient,
+    Recipe, ShoppingCart, Tag
+)
 
 
 class UsersViewSet(UserViewSet):
@@ -24,11 +28,18 @@ class UsersViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = UsersSerializer
     pagination_class = LimitPagePagination
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
-    search_fields = ('username', 'email')
+    filter_backends = (
+        DjangoFilterBackend,
+        filters.SearchFilter,
+    )
+    search_fields = (
+        'username',
+        'email'
+    )
     permission_classes = (AllowAny, )
 
     def subscribed(self, serializer, id=None):
+        """Создает подписку на автора."""
         follower = get_object_or_404(User, id=id)
         if self.request.user == follower:
             return Response({'message': 'Нельзя подписаться на себя'},
@@ -39,6 +50,7 @@ class UsersViewSet(UserViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def unsubscribed(self, serializer, id=None):
+        """удалет связь между пользователями."""
         follower = get_object_or_404(User, id=id)
         Follow.objects.filter(user=self.request.user,
                               author=follower).delete()
@@ -48,6 +60,7 @@ class UsersViewSet(UserViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated])
     def subscribe(self, serializer, id):
+        """Создаёт связь между пользователями."""
         if self.request.method == 'DELETE':
             return self.unsubscribed(serializer, id)
         return self.subscribed(serializer, id)
@@ -55,6 +68,7 @@ class UsersViewSet(UserViewSet):
     @action(detail=False, methods=['get'],
             permission_classes=[permissions.IsAuthenticated])
     def subscriptions(self, serializer):
+        """Список подписок пользоваетеля."""
         following = Follow.objects.filter(user=self.request.user)
         pages = self.paginate_queryset(following)
         serializer = FollowSerializer(pages, many=True)
@@ -80,7 +94,7 @@ class IngredientViewSet(viewsets.ModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    """Вьюсет для рецептов."""
+    """Вьюсет для рецептов"""
     queryset = Recipe.objects.all()
     permission_classes = (AdminOrAuthor,)
     pagination_class = LimitPagePagination
@@ -103,6 +117,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def favorite(self, request, pk):
+        """Добавляет/удалет рецепт в `избранное`."""
         recipe = get_object_or_404(Recipe, pk=pk)
         if request.method == 'POST':
             Favorite.objects.create(user=request.user,
@@ -120,6 +135,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk):
+        """Добавляет/удалет рецепт в список покупок."""
         recipe = get_object_or_404(Recipe, pk=pk)
         if request.method == 'POST':
             ShoppingCart.objects.create(user=request.user,
@@ -136,6 +152,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def download_shopping_cart(self, request):
+        """Загружает файл *.txt co списком покупок."""
         user = request.user
         ingredients = AmountIngredients.objects.filter(
             recipe__shopping_cart__user=user).values(

@@ -6,27 +6,32 @@ MAX_LEN_FIELD = 150
 
 class User(AbstractUser):
     """Модель для пользователей."""
-    username = models.CharField('Уникальный юзернейм',
-                                max_length=MAX_LEN_FIELD,
-                                blank=False,
-                                unique=True,
-                                )
-    password = models.CharField('Пароль',
-                                max_length=MAX_LEN_FIELD,
-                                blank=False,
-                                )
-    email = models.CharField(max_length=254,
-                             blank=False,
-                             verbose_name='Адрес электронной почты',
-                             )
-    first_name = models.CharField('Имя',
-                                  max_length=MAX_LEN_FIELD,
-                                  blank=False,
-                                  )
-    last_name = models.CharField('Фамилия',
-                                 max_length=MAX_LEN_FIELD,
-                                 blank=False,
-                                 )
+    username = models.CharField(
+        'Уникальный юзернейм',
+        max_length=MAX_LEN_FIELD,
+        blank=False,
+        unique=True,
+    )
+    password = models.CharField(
+        'Пароль',
+        max_length=MAX_LEN_FIELD,
+        blank=False,
+    )
+    email = models.CharField(
+        max_length=254,
+        blank=False,
+        verbose_name='Адрес электронной почты',
+    )
+    first_name = models.CharField(
+        'Имя',
+        max_length=MAX_LEN_FIELD,
+        blank=False,
+    )
+    last_name = models.CharField(
+        'Фамилия',
+        max_length=MAX_LEN_FIELD,
+        blank=False,
+    )
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -42,12 +47,14 @@ class Follow(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='follower',
-        verbose_name='Подписчик')
+        verbose_name='Подписчик'
+    )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='following',
-        verbose_name='Автор')
+        verbose_name='Автор'
+    )
 
     class Meta:
         ordering = ['-id']
