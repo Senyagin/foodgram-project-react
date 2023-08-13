@@ -62,9 +62,6 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
-          # Выполняет pull образа с DockerHub
-
-
           sudo docker pull senyaginserg/foodgram-backend:latest
           ${{ secrets.DOCKER_USERNAME }}/foodgram-frontend:latest
           sudo docker-compose stop
