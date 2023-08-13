@@ -12,7 +12,7 @@ class AdminOrReadOnly(BasePermission):
 
 
 class AuthorOrReadOnly(BasePermission):
-    """Пермишн с правами доступа для авторов."""
+    """Пермишн с правами доступа для авторов"""
     def has_object_permission(self, request, view, obj):
         return (
             request.method in SAFE_METHODS
