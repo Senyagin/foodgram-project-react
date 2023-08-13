@@ -2,7 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator
 
 from users.models import User
-from api.validators import validate_time
+from recipes.validators import validate_time
 
 MAX_LEN_FIELD = 200
 MAX_LEN_COLOR = 7

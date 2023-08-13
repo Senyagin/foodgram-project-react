@@ -17,15 +17,17 @@ from recipes.models import (
     Ingredient, Recipe,
     ShoppingCart, Tag
 )
-from api.validators import validate_time, validate_ingredients
+from recipes.validators import validate_time, validate_ingredients
 
 
 class CreateUserSerializer(UserCreateSerializer):
     """Сериализатор для регистрации пользователей."""
-    username = CharField(validators=[UniqueValidator(
-        queryset=User.objects.all())])
-    email = EmailField(validators=[UniqueValidator(
-        queryset=User.objects.all())])
+    username = CharField(
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    email = EmailField(
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
 
     class Meta:
         model = User
@@ -57,13 +59,11 @@ class UsersSerializer(UserSerializer):
     def get_is_subscribed(self, obj):
         """Проверка подписки пользователей."""
         request = self.context.get('request')
-        if request is not None:
-            current_user = request.user
-            if current_user.is_authenticated:
-                return Follow.objects.filter(
-                    user=current_user,
-                    author=obj
-                ).exists()
+        if request is not None and request.user.is_authenticated:
+            return Follow.objects.filter(
+                user=request.user,
+                author=obj
+            ).exists()
         return False
 
 
@@ -147,10 +147,12 @@ class RecipeSerializer(ModelSerializer):
 
     def get_is_favorited(self, obj):
         """Проверка - находится ли рецепт в избранном"""
-        user = self.context.get('request').user
-        if user.is_authenticated or self.context.get('request') is not None:
+        request = self.context.get('request')
+        if request.user.is_authenticated or request is not None:
             return Favorite.objects.filter(
-                user=user, recipe=obj).exists()
+                user=request.user,
+                recipe=obj
+            ).exists()
         return False
 
     @staticmethod
@@ -163,8 +165,10 @@ class RecipeSerializer(ModelSerializer):
 class RecipeCreateSerializer(ModelSerializer):
     """Сериализатор для создания рецептов."""
     ingredients = IngredientCreateSerializer(many=True)
-    tags = PrimaryKeyRelatedField(queryset=Tag.objects.all(),
-                                  many=True)
+    tags = PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),
+        many=True
+    )
     image = Base64ImageField()
     name = CharField(max_length=200)
     cooking_time = IntegerField()
@@ -201,6 +205,7 @@ class RecipeCreateSerializer(ModelSerializer):
 
     @atomic
     def create(self, validated_data):
+        """Создание рецепта"""
         tags_data = validated_data.pop('tags')
         ingredients_data = validated_data.pop('ingredients')
         image = validated_data.pop('image')
@@ -214,6 +219,7 @@ class RecipeCreateSerializer(ModelSerializer):
 
     @atomic
     def update(self, recipe, validated_data):
+        """Обновление рецепта"""
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         AmountIngredients.objects.filter(recipe=recipe).delete()
@@ -228,6 +234,7 @@ class RecipeCreateSerializer(ModelSerializer):
         )
 
     def to_representation(self, recipe):
+        """Переопределение рецепта"""
         data = RecipeSerializer(
             recipe,
             context={'request': self.context.get('request')}).data
@@ -239,6 +246,7 @@ class RecipeCreateSerializer(ModelSerializer):
         return cooking_time
 
     def validate(self, data):
+        """Проверяем ингредиенты в рецепте."""
         ingredients = self.initial_data.get('ingredients')
         valid_ingredients = validate_ingredients(ingredients)
         data['ingredients'] = valid_ingredients
@@ -247,6 +255,8 @@ class RecipeCreateSerializer(ModelSerializer):
 
 class RecipeForFollowersSerializer(ModelSerializer):
     """Сериализатор для вывода рецептов в избранном и списке покупок."""
+    image = Base64ImageField()
+
     class Meta:
         model = Recipe
         fields = (
@@ -264,6 +274,7 @@ class RecipeFollowUserField(Field):
         return Recipe.objects.filter(author=instance.author)
 
     def to_representation(self, recipes_list):
+        """Переопределение списка рецептов"""
         recipes_data = []
         for recipes in recipes_list:
             recipes_data.append(
@@ -302,7 +313,12 @@ class FollowSerializer(ModelSerializer):
         )
 
     def get_recipes_count(self, obj):
+        """Достаем количество рецептов."""
         return Recipe.objects.filter(author=obj.author).count()
 
     def get_is_subscribed(self, obj):
-        return Follow.objects.filter(user=obj.user, author=obj.author).exists()
+        """Проверка подписки пользователей."""
+        return Follow.objects.filter(
+            user=obj.user,
+            author=obj.author
+        ).exists()

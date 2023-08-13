@@ -26,14 +26,17 @@ class RecipesFilter(FilterSet):
         )
 
     def get_favorite(self, queryset, name, value):
+        """Фильтрация для избранного"""
         if value:
             return queryset.filter(favorite__user=self.request.user)
         return queryset.exclude(favorite__user=self.request.user)
 
     def get_shopping_cart(self, queryset, name, value):
+        """Фильтрация для списка покупок"""
         if value:
             return Recipe.objects.filter(shopping_cart__user=self.request.user)
 
 
 class IngredientSearchFilter(SearchFilter):
+    """Фильтр для поиска ингредиентов по имени"""
     search_param = 'name'
