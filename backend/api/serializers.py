@@ -136,24 +136,22 @@ class RecipeSerializer(ModelSerializer):
     def get_is_in_shopping_cart(self, obj):
         """Проверка - находится ли рецепт в списке  покупок."""
         request = self.context.get('request')
-        if request:
-            current_user = request.user
-            if current_user.is_authenticated:
-                return ShoppingCart.objects.filter(
-                    user=current_user,
-                    recipe=obj.id
-                ).exists()
+        if request is None or request.user.is_anonymous:
             return False
+        return ShoppingCart.objects.filter(
+            user=request.user,
+            recipe=obj.id
+        ).exists()
 
     def get_is_favorited(self, obj):
         """Проверка - находится ли рецепт в избранном"""
         request = self.context.get('request')
-        if request.user.is_authenticated or request is not None:
-            return Favorite.objects.filter(
-                user=request.user,
-                recipe=obj
-            ).exists()
-        return False
+        if request is None or request.user.is_anonymous:
+            return False
+        return Favorite.objects.filter(
+            user=request.user,
+            recipe=obj.id
+        ).exists()
 
     @staticmethod
     def get_ingredients(obj):
