@@ -1,5 +1,5 @@
 from rest_framework.filters import SearchFilter
-from django_filters.rest_framework import filters
+from django_filters.rest_framework import filters, FilterSet
 
 from recipes.models import Recipe, Ingredient, Tag, Favorite, ShoppingCart
 
@@ -10,7 +10,7 @@ CHOICES_LIST = (
 )
 
 
-class RecipesFilter(filters.FilterSet):
+class RecipesFilter(FilterSet):
     """"Фильтр для сортировки рецептов."""""
     is_favorited = filters.ChoiceFilter(
         method='is_favorited_method',
