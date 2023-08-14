@@ -1,42 +1,65 @@
 from rest_framework.filters import SearchFilter
-from django_filters.rest_framework import (
-    AllValuesMultipleFilter,
-    BooleanFilter,
-    FilterSet
+from django_filters.rest_framework import filters
+
+from recipes.models import Recipe, Ingredient, Tag, Favorite, ShoppingCart
+
+
+CHOICES_LIST = (
+    ('0', 'False'),
+    ('1', 'True')
 )
 
-from recipes.models import Recipe
 
-
-class RecipesFilter(FilterSet):
+class RecipesFilter(filters.FilterSet):
     """"Фильтр для сортировки рецептов."""""
-    tags = AllValuesMultipleFilter(
-        field_name='tags__slug',
-        label='tags'
+    is_favorited = filters.ChoiceFilter(
+        method='is_favorited_method',
+        choices=CHOICES_LIST
     )
-    favorite = BooleanFilter(method='get_favorite')
-    shopping_cart = BooleanFilter(method='get_shopping_cart')
+    is_in_shopping_cart = filters.ChoiceFilter(
+        method='is_in_shopping_cart_method',
+        choices=CHOICES_LIST
+    )
+    author = filters.NumberFilter(
+        field_name='author',
+        lookup_expr='exact'
+    )
+    tags = filters.ModelMultipleChoiceFilter(
+        field_name='tags__slug',
+        to_field_name='slug',
+        queryset=Tag.objects.all()
+    )
+
+    def is_favorited_method(self, queryset, name, value):
+        if self.request.user.is_anonymous:
+            return Recipe.objects.none()
+
+        favorites = Favorite.objects.filter(user=self.request.user)
+        recipes = [item.recipe.id for item in favorites]
+        if value == '1':
+            return queryset.filter(id__in=recipes)
+        if value == '0':
+            return queryset.exclude(id__in=recipes)
+
+    def is_in_shopping_cart_method(self, queryset, name, value):
+        if self.request.user.is_anonymous:
+            return Recipe.objects.none()
+        shopping_chart = ShoppingCart.objects.filter(user=self.request.user)
+        recipes = [item.recipe.id for item in shopping_chart]
+        if value == '1':
+            return queryset.filter(id__in=recipes)
+        if value == '0':
+            return queryset.exclude(id__in=recipes)
 
     class Meta:
         model = Recipe
-        fields = (
-            'author', 'tags',
-            'favorite',
-            'shopping_cart'
-        )
-
-    def get_favorite(self, queryset, name, value):
-        """Фильтрация для избранного"""
-        if value:
-            return queryset.filter(favorite__user=self.request.user)
-        return queryset.exclude(favorite__user=self.request.user)
-
-    def get_shopping_cart(self, queryset, name, value):
-        """Фильтрация для списка покупок"""
-        if value:
-            return Recipe.objects.filter(shopping_cart__user=self.request.user)
+        fields = ('author', 'tags')
 
 
 class IngredientSearchFilter(SearchFilter):
     """Фильтр для поиска ингредиентов по имени"""
-    search_param = 'name'
+    name = filters.CharFilter(field_name='name', lookup_expr='istartswith')
+
+    class Meta:
+        model = Ingredient
+        fields = ('name',)
