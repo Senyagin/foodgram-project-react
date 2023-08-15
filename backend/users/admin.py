@@ -18,7 +18,7 @@ class PersonAdmin(admin.ModelAdmin):
         'email',
     )
     search_fields = (
-        'user__username',
+        'username',
     )
 
 
