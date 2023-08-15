@@ -58,13 +58,13 @@ class UsersSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         """Проверка подписки пользователей."""
-        request = self.context.get('request')
-        if request is None and request.user.is_anonymous:
-            return False
-        return Follow.objects.filter(
-            user=request.user,
-            author=obj
-        ).exists()
+        request = self.context.get('request') 
+        if request is not None and request.user.is_authenticated: 
+            return Follow.objects.filter( 
+                user=request.user, 
+                author=obj 
+            ).exists() 
+        return False 
 
 
 class TagSerializer(ModelSerializer):
