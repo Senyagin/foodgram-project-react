@@ -16,14 +16,14 @@ def validate_time(value):
 def validate_ingredients(data):
     """Валидация ингредиентов и количества."""
     if not data:
-        raise ValidationError({'ingredients': ['Обязательное поле.']})
+        raise ValidationError(['Обязательное поле.'])
     if len(data) < COUNT_INGREDIENTS:
-        raise ValidationError({'ingredients': ['He переданы ингредиенты.']})
+        raise ValidationError(['He переданы ингредиенты.'])
     unique_ingredient = []
     for ingredient in data:
         if not ingredient.get('id'):
             raise ValidationError(
-                {'ingredients': ['Отсутствует id ингредиента.']}
+                ['Отсутствует id ингредиента.']
             )
         id = ingredient.get('id')
         if id in unique_ingredient:
@@ -34,6 +34,6 @@ def validate_ingredients(data):
         amount = int(ingredient.get('amount'))
         if amount < 1:
             raise ValidationError(
-                {'amount': ['Количество не может быть менее 1.']}
+                ['Количество не может быть менее 1.']
             )
     return data
