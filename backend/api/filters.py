@@ -30,7 +30,12 @@ class RecipesFilter(FilterSet):
         queryset=Tag.objects.all()
     )
 
+    class Meta:
+        model = Recipe
+        fields = ('author', 'tags')
+
     def is_favorited_method(self, queryset, name, value):
+        """Метод сортировки избранного."""
         if self.request.user.is_anonymous:
             return Recipe.objects.none()
 
@@ -42,6 +47,7 @@ class RecipesFilter(FilterSet):
             return queryset.exclude(id__in=recipes)
 
     def is_in_shopping_cart_method(self, queryset, name, value):
+        """Метод сортировки списка покупок."""
         if self.request.user.is_anonymous:
             return Recipe.objects.none()
         shopping_chart = ShoppingCart.objects.filter(user=self.request.user)
@@ -51,14 +57,11 @@ class RecipesFilter(FilterSet):
         if value == '0':
             return queryset.exclude(id__in=recipes)
 
-    class Meta:
-        model = Recipe
-        fields = ('author', 'tags')
-
 
 class IngredientSearchFilter(SearchFilter):
     """Фильтр для поиска ингредиентов по имени"""
     name = filters.CharFilter(field_name='name', lookup_expr='istartswith')
+    search_param = 'name'
 
     class Meta:
         model = Ingredient
