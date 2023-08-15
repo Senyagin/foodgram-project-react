@@ -11,7 +11,7 @@ from users.models import Follow, User
 
 from .filters import IngredientSearchFilter, RecipesFilter
 from .pagination import LimitPagePagination
-from .permissions import AdminOrAuthor, AdminOrReadOnly
+from .permissions import IsAuthorOrReadOnly
 from .serializers import (
     FollowSerializer, IngredientSerializer,
     RecipeCreateSerializer, RecipeForFollowersSerializer,
@@ -82,14 +82,14 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
-    permission_classes = (AdminOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly,)
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
     """Вьюсет для модели ингредиентов."""
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    permission_classes = (AdminOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly,)
     pagination_class = None
     filter_backends = (IngredientSearchFilter,)
     search_fields = ('^name',)
@@ -98,7 +98,7 @@ class IngredientViewSet(viewsets.ModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет для рецептов"""
     queryset = Recipe.objects.all()
-    permission_classes = (AdminOrReadOnly, AdminOrAuthor)
+    permission_classes = [IsAuthorOrReadOnly]
     pagination_class = LimitPagePagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipesFilter
