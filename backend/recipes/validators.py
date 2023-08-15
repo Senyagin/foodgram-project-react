@@ -28,7 +28,7 @@ def validate_ingredients(data):
         id = ingredient.get('id')
         if id in unique_ingredient:
             raise ValidationError(
-                ['Нельзя выбирать один и тот же ингридиент дважды']
+                ['Нельзя выбирать один и тот же ингредиент дважды']
             )
         unique_ingredient.append(id)
         amount = int(ingredient.get('amount'))

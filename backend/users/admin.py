@@ -19,6 +19,7 @@ class PersonAdmin(admin.ModelAdmin):
     )
     search_fields = (
         'username',
+        'email'
     )
 
 

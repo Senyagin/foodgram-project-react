@@ -48,7 +48,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'tags'
     )
     search_fields = (
-        'recipe__name',
+        'name',
         'author__username'
         'tags__name'
     )
