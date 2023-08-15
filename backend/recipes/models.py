@@ -120,8 +120,8 @@ class AmountIngredients(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Ингридиент в рецепте'
-        verbose_name_plural = 'Ингридиентов в рецепте'
+        verbose_name = 'Ингредиент в рецепте'
+        verbose_name_plural = 'Ингредиентов в рецепте'
 
     def __str__(self) -> str:
         return f'{self.amount} {self.ingredients}'
