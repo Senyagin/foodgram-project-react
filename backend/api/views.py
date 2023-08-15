@@ -24,7 +24,7 @@ from recipes.models import (
 
 
 class UsersViewSet(UserViewSet):
-    """Вьюсет для модели пользователей."""
+    """Вьюсет для модели пользователей"""
     queryset = User.objects.all()
     serializer_class = UsersSerializer
     pagination_class = LimitPagePagination
