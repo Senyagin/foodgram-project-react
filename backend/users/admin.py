@@ -17,6 +17,9 @@ class PersonAdmin(admin.ModelAdmin):
         'first_name',
         'email',
     )
+    search_fields = (
+        'user__username',
+    )
 
 
 @register(Follow)
@@ -26,7 +29,7 @@ class FollowAdmin(admin.ModelAdmin):
         'user',
     )
     search_fields = (
-        'user',
-        'author',
+        'user__username',
+        'author__username',
     )
     list_per_page = 20

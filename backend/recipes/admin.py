@@ -47,6 +47,11 @@ class RecipeAdmin(admin.ModelAdmin):
         'name',
         'tags'
     )
+    search_fields = (
+        'recipe__name',
+        'author__username'
+        'tags__name'
+    )
 
     def count_favorites(self, obj: Recipe):
         return obj.favorite.count()
@@ -66,8 +71,8 @@ class AmountIngredientstAdmin(admin.ModelAdmin):
         'amount'
     )
     search_fields = (
-        'recipe',
-        'ingredient'
+        'recipe__name',
+        'ingredients__name'
     )
 
 
@@ -83,8 +88,8 @@ class FavoriteAdmin(admin.ModelAdmin):
         'user'
     )
     search_fields = (
-        'recipe',
-        'user'
+        'recipe__name',
+        'user__username'
     )
 
 
@@ -100,6 +105,6 @@ class ShoppingCartAdmin(admin.ModelAdmin):
         'user'
     )
     search_fields = (
-        'recipe',
-        'user'
+        'recipe__name',
+        'user__username'
     )

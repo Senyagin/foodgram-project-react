@@ -90,7 +90,7 @@ class Recipe(models.Model):
     )
 
     class Meta:
-        ordering = ['-pub_date']
+        ordering = ['pub_date']
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
@@ -99,7 +99,7 @@ class Recipe(models.Model):
 
 
 class AmountIngredients(models.Model):
-    """Модель, описывающая количество ингридиентов."""
+    """Модель, описывающая количество ингридиентов в рецепте."""
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -120,8 +120,8 @@ class AmountIngredients(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Ингридиент'
-        verbose_name_plural = 'Количество ингридиентов'
+        verbose_name = 'Ингридиент в рецепте'
+        verbose_name_plural = 'Ингридиентов в рецепте'
 
     def __str__(self) -> str:
         return f'{self.amount} {self.ingredients}'
@@ -164,3 +164,4 @@ class ShoppingCart(models.Model):
 
     class Meta:
         verbose_name = 'Список покупок'
+        verbose_name_plural = 'Список покупок'

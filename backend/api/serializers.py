@@ -17,8 +17,7 @@ from recipes.models import (
     Ingredient, Recipe,
     ShoppingCart, Tag
 )
-from recipes.validators import validate_time
-from rest_framework import exceptions
+from recipes.validators import validate_time, validate_ingredients
 
 
 class CreateUserSerializer(UserCreateSerializer):
@@ -244,19 +243,12 @@ class RecipeCreateSerializer(ModelSerializer):
         cooking_time = validate_time(cooking_time)
         return cooking_time
 
-    def validate_ingredients(self, ingredients):
-        if not ingredients:
-            raise exceptions.ValidationError(
-                'Должен быть хотя бы один ингредиент.'
-            )
-
-        ingredients_id_list = [ingredient['id'] for ingredient in ingredients]
-        for ingredient_id in ingredients_id_list:
-            if ingredients_id_list.count(ingredient_id) > 1:
-                raise exceptions.ValidationError(
-                    'У рецепка не может быть два одинаковых игредиента.'
-                )
-        return ingredients
+    def validate(self, data):
+        """Проверяем ингредиенты в рецепте."""
+        ingredients = self.initial_data.get('ingredients')
+        valid_ingredients = validate_ingredients(ingredients)
+        data['ingredients'] = valid_ingredients
+        return data
 
 
 class RecipeForFollowersSerializer(ModelSerializer):
