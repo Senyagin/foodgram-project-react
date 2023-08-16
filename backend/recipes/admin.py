@@ -48,6 +48,10 @@ class RecipeAdmin(admin.ModelAdmin):
         'name',
         'tags'
     )
+    search_fields = (
+        'name',
+        'author__username',
+    )
 
     def count_favorites(self, obj: Recipe):
         return obj.favorite.count()

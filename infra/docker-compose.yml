@@ -10,7 +10,7 @@ services:
       - ./.env
 
   backend:
-    image: senyaginserg/foodgram_backend_local:latest
+    image: senyaginserg/foodgram_backend:latest
     restart: always
     volumes:
       - static_value:/app/static/
@@ -21,7 +21,7 @@ services:
       - ./.env
 
   frontend:
-    image: senyaginserg/foodgram_frontend_local:latest
+    image: senyaginserg/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
