@@ -8,6 +8,7 @@ from .models import (
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
+    """Панель администратора для модели тэгов"""
     list_display = (
         'id',
         'name',
@@ -23,6 +24,7 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
+    """Панель администратора для модели ингредиентов"""
     list_display = (
         'id',
         'name',
@@ -37,6 +39,7 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
+    """Панель администратора для модели рецептов"""
     list_display = (
         'name',
         'author',
@@ -51,6 +54,7 @@ class RecipeAdmin(admin.ModelAdmin):
     search_fields = (
         'name',
         'author__username',
+        'tags__name'
     )
 
     def count_favorites(self, obj: Recipe):
@@ -59,6 +63,8 @@ class RecipeAdmin(admin.ModelAdmin):
 
 @admin.register(AmountIngredients)
 class AmountIngredientstAdmin(admin.ModelAdmin):
+    """Панель администратора для модели описывающую
+       количество игредиентов в рецепте."""
     list_display = (
         'id',
         'recipe',
@@ -78,6 +84,7 @@ class AmountIngredientstAdmin(admin.ModelAdmin):
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
+    """Панель администратора для модели избранного"""
     list_display = (
         'id',
         'recipe',
@@ -95,6 +102,7 @@ class FavoriteAdmin(admin.ModelAdmin):
 
 @admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
+    """Панель администратора для модели списка покупок"""
     list_display = (
         'id',
         'recipe',
